@@ -130,13 +130,13 @@ extends Module {
 
     private void applyRotation(Rotation rotation) {
         rotation.snapToSensitivity(Float.valueOf((float) mc.options.sensitivity().get().doubleValue()));
-        float f = rotation.getYaw();
-        float f2 = rotation.getPitch();
-        mc.player.setXRot(f2);
-        mc.player.setYRot(f);
+        float yaw = rotation.getYaw();
+        float pitch = rotation.getPitch();
+        mc.player.setXRot(pitch);
+        mc.player.setYRot(yaw);
         mc.player.setXRot(Mth.clamp(mc.player.getXRot(), -90.0f, 90.0f));
-        mc.player.xRotO = f2;
-        mc.player.yRotO = f;
+        mc.player.xRotO = pitch;
+        mc.player.yRotO = yaw;
         mc.player.xRotO = Mth.clamp(mc.player.xRotO, -90.0f, 90.0f);
     }
 
@@ -154,12 +154,12 @@ extends Module {
         return new Rotation(mc.player.getRotationVector().y, mc.player.getRotationVector().x);
     }
 
-    public static float getAngleDifference(double d, double d2) {
-        return Float.parseFloat(Double.valueOf(Mth.wrapDegrees(d - d2)).toString());
+    public static float getAngleDifference(double a, double b) {
+        return Float.parseFloat(Double.valueOf(Mth.wrapDegrees(a - b)).toString());
     }
 
     private boolean isInFov(Rotation rotation, Entity entity) {
-        float f = AimAssist.getAngleDifference(entity.getYRot(), rotation.getYaw());
-        return (double)Math.abs(f) <= this.fov.getValue().doubleValue() / 2.0;
+        float diff = AimAssist.getAngleDifference(entity.getYRot(), rotation.getYaw());
+        return (double)Math.abs(diff) <= this.fov.getValue().doubleValue() / 2.0;
     }
 }

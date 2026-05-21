@@ -35,23 +35,23 @@ extends Module {
 
     public abstract void onSettings();
 
-    public boolean mousePressed(int n, int n2, int n3) {
-        if (this.isHovered(n, n2) && n3 == 0) {
+    public boolean mousePressed(int mouseX, int mouseY, int button) {
+        if (this.isHovered(mouseX, mouseY) && button == 0) {
             this.visible = true;
-            this.dragOffsetX = (float)n - this.getX();
-            this.dragOffsetY = (float)n2 - this.getY();
+            this.dragOffsetX = (float)mouseX - this.getX();
+            this.dragOffsetY = (float)mouseY - this.getY();
             return true;
         }
         return false;
     }
 
-    public void mouseDragged(int n, int n2) {
-        this.x = (float)n - this.dragOffsetX;
-        this.y = (float)n2 - this.dragOffsetY;
+    public void mouseDragged(int mouseX, int mouseY) {
+        this.x = (float)mouseX - this.dragOffsetX;
+        this.y = (float)mouseY - this.dragOffsetY;
     }
 
-    public boolean isHovered(int n, int n2) {
-        return RenderUtil.isHovered(this.x, this.y, this.hudWidth, this.hudHeight, n, n2);
+    public boolean isHovered(int mouseX, int mouseY) {
+        return RenderUtil.isHovered(this.x, this.y, this.hudWidth, this.hudHeight, mouseX, mouseY);
     }
 
     public void stopDragging() {
@@ -75,23 +75,23 @@ extends Module {
     }
 
     @Generated
-    public void setWidth(float f) {
-        this.hudWidth = f;
+    public void setWidth(float width) {
+        this.hudWidth = width;
     }
 
     @Generated
-    public void setHeight(float f) {
-        this.hudHeight = f;
+    public void setHeight(float height) {
+        this.hudHeight = height;
     }
 
     @Generated
-    protected void setDragging(boolean bl) {
-        this.dragging = bl;
+    protected void setDragging(boolean dragging) {
+        this.dragging = dragging;
     }
 
     @Override
     @Generated
-    public void setEnabled(boolean bl) {
-        this.visible = bl;
+    public void setEnabled(boolean enabled) {
+        this.visible = enabled;
     }
 }

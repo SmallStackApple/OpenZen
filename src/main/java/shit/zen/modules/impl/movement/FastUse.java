@@ -598,7 +598,7 @@ public class FastUse extends Module implements TripleProvider {
         return "NoSlow".equals(this.mode.getValue());
     }
 
-    private Packet<?> createUseItemPacket(int n) {
-        return new ServerboundUseItemPacket(this.useHand, n);
+    private Packet<?> createUseItemPacket(int sequence) {
+        return new ServerboundUseItemPacket(this.useHand, sequence);
     }
 }

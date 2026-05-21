@@ -100,8 +100,8 @@ public class ESP extends Module {
     }
 
     private boolean isInRange(Entity entity) {
-        double d = mc.player.distanceToSqr(entity);
-        return d < 10000.0;
+        double distSq = mc.player.distanceToSqr(entity);
+        return distSq < 10000.0;
     }
 
     @EventTarget
@@ -226,7 +226,7 @@ public class ESP extends Module {
         // Skeleton rendering omitted (heavy obfuscated code); enable Glow mode instead.
     }
 
-    private Color getHealthColor(float f) {
-        return Color.getHSBColor(Math.max(0.0f, f) / 3.0f, 1.0f, 1.0f);
+    private Color getHealthColor(float fraction) {
+        return Color.getHSBColor(Math.max(0.0f, fraction) / 3.0f, 1.0f, 1.0f);
     }
 }

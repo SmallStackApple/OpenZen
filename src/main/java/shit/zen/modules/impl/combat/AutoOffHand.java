@@ -78,11 +78,11 @@ public class AutoOffHand extends Module {
 
     private boolean isNearEnemy() {
         if (mc.level == null || mc.player == null) return false;
-        double d = this.range.getValue().doubleValue();
+        double rangeValue = this.range.getValue().doubleValue();
         return mc.level.players().stream().anyMatch(
                 p -> !p.equals(mc.player)
                         && !p.isRemoved()
-                        && mc.player.distanceToSqr(p) <= d * d
+                        && mc.player.distanceToSqr(p) <= rangeValue * rangeValue
                         && this.hasLineOfSight(p));
     }
 
