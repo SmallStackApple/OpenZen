@@ -133,7 +133,7 @@ extends AntiKBMode {
                 this.release();
             }
             this.resetSuspension();
-            ChatUtil.print("Flag Detected");
+            debugLog("Flag Detected");
             this.flagCooldown = 2;
         }
         if (this.flagCooldown != 0) {
@@ -175,7 +175,7 @@ extends AntiKBMode {
                     this.suspendTicks = 0;
                     this.knockbackPacket = motionPacket;
                     receivePacketEvent.setCancelled(true);
-                    ChatUtil.print("Alink Wait");
+                    debugLog("Alink Wait");
                 }
             }
         }
@@ -329,7 +329,7 @@ extends AntiKBMode {
             boolean onGround = mc.player.onGround();
             boolean isTimeout = this.suspendTicks >= 12;
             if (onGround || isTimeout) {
-                ChatUtil.print(isTimeout ? "Alink Timeout" : "ground");
+                debugLog(isTimeout ? "Alink Timeout" : "ground");
                 if (instantAttackEnabled) {
                     ZenClient.serverTickRate = 1.0f;
                 }
@@ -376,7 +376,7 @@ extends AntiKBMode {
                 this.instantAttackProgress = 0.0f;
                 this.isInstantAttacking = false;
                 ZenClient.serverTickRate = 1.0f;
-                ChatUtil.print("done");
+                debugLog("done");
             }
         }
         if (this.attacksRemaining > 0 && this.attackTarget != null) {
@@ -417,7 +417,7 @@ extends AntiKBMode {
         if (this.attacksRemaining <= 0) {
             this.clearTarget();
             if (AntiKB.INSTANCE.instantAttack.getValue()) {
-                ChatUtil.print("Attack (" + AntiKB.INSTANCE.attackAmount.getValue().intValue() + ")");
+                debugLog("Attack (" + AntiKB.INSTANCE.attackAmount.getValue().intValue() + ")");
             }
         }
     }
@@ -427,7 +427,7 @@ extends AntiKBMode {
             return false;
         }
         if (AntiKB.INSTANCE.sprintStateCheck.getValue() && !mc.player.isSprinting()) {
-            ChatUtil.print("not sprinting");
+            debugLog("not sprinting");
             return false;
         }
         boolean wasSprinting = mc.player.isSprinting();
@@ -441,7 +441,7 @@ extends AntiKBMode {
             mc.player.setDeltaMovement(velocity.x * 0.6, velocity.y, velocity.z * 0.6);
         }
         if (!AntiKB.INSTANCE.instantAttack.getValue()) {
-            ChatUtil.print("Attack (" + this.attacksRemaining + ")");
+            debugLog("Attack (" + this.attacksRemaining + ")");
         }
         return true;
     }
@@ -494,6 +494,10 @@ extends AntiKBMode {
         this.instantAttackProgress = 0.0f;
         this.isInstantAttacking = false;
         ZenClient.serverTickRate = 1.0f;
+    }
+
+    private void debugLog(String msg) {
+        if (AntiKB.INSTANCE.debug.getValue()) ChatUtil.print(msg);
     }
 
     static {

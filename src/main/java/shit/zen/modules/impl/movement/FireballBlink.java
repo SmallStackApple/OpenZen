@@ -17,6 +17,7 @@ import shit.zen.event.impl.Render2DEvent;
 import shit.zen.event.impl.SprintEvent;
 import shit.zen.modules.Category;
 import shit.zen.modules.Module;
+import shit.zen.settings.impl.BooleanSetting;
 import shit.zen.utils.game.MovementUtil;
 import shit.zen.utils.misc.ChatUtil;
 import shit.zen.utils.render.RenderUtil;
@@ -26,6 +27,7 @@ import shit.zen.event.EventTarget;
 public class FireballBlink extends Module {
     public static FireballBlink INSTANCE;
     public static Rotation rotation;
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
 
     private boolean isBackwardsMode;
     private boolean isBypassing;
@@ -126,7 +128,7 @@ public class FireballBlink extends Module {
     private int ensureFireChargeSlot() {
         int slot = this.getFireChargeSlot();
         if (slot == -1) {
-            ChatUtil.print("No fire charge found");
+            debugLog("No fire charge found");
             this.setEnabled(false);
         }
         return slot;
@@ -187,7 +189,7 @@ public class FireballBlink extends Module {
                     this.fireChargeSlot = mc.player.getInventory().selected;
                     mc.player.getInventory().selected = slot;
                     this.fireballPrepareTick = 1;
-                    ChatUtil.print("Queued fireball " + (this.queuedFireballs + 1));
+                    debugLog("Queued fireball " + (this.queuedFireballs + 1));
                 }
             }
         } else if (!middleDown) {
@@ -197,19 +199,19 @@ public class FireballBlink extends Module {
         if (mouse4Down && !this.isSprinting) {
             this.isSprinting = true;
             if (this.isBlinking && this.pendingReleases < this.impulseCount) {
-                ChatUtil.print("Release " + (this.pendingReleases + 1) + "/" + this.impulseCount);
+                debugLog("Release " + (this.pendingReleases + 1) + "/" + this.impulseCount);
                 this.releaseImpulse(this.pendingReleases);
                 this.pendingReleases++;
                 if (this.pendingReleases >= this.impulseCount) {
-                    ChatUtil.print("Blink finished");
+                    debugLog("Blink finished");
                     this.isBlinking = false;
                     this.setEnabled(false);
                 }
             } else if (!this.isBlinking) {
-                ChatUtil.print("No blink to release");
+                debugLog("No blink to release");
                 this.setEnabled(false);
             } else {
-                ChatUtil.print("All impulses released");
+                debugLog("All impulses released");
             }
         } else if (!mouse4Down) {
             this.isSprinting = false;
@@ -273,7 +275,7 @@ public class FireballBlink extends Module {
                     && motion.getId() == mc.player.getId()) {
                 ++this.impulseCount;
                 this.impulsePacketBoundaries.add(this.packetQueue.size());
-                mc.execute(() -> ChatUtil.print("Impulse " + this.impulseCount + " queued"));
+                mc.execute(() -> debugLog("Impulse " + this.impulseCount + " queued"));
             }
             packetEvent.setCancelled(true);
             this.packetQueue.add(packet);
@@ -287,12 +289,12 @@ public class FireballBlink extends Module {
                 && !this.isBlinking) {
             ++this.impulseCount;
             this.impulsePacketBoundaries.add(this.packetQueue.size());
-            mc.execute(() -> ChatUtil.print("Fireball impulse " + this.impulseCount));
+            mc.execute(() -> debugLog("Fireball impulse " + this.impulseCount));
             packetEvent.setCancelled(true);
             this.packetQueue.add(packetEvent.getPacket());
             this.isBlinking = true;
             this.blinkStartTime = System.currentTimeMillis();
-            mc.execute(() -> ChatUtil.print("Blink started"));
+            mc.execute(() -> debugLog("Blink started"));
         }
     }
 
@@ -305,7 +307,7 @@ public class FireballBlink extends Module {
             if (this.fireballPrepareTick > 0) {
                 if (this.fireballPrepareTick == 1) {
                     this.queuedFireballs++;
-                    ChatUtil.print("Preparing fireball #" + this.queuedFireballs);
+                    debugLog("Preparing fireball #" + this.queuedFireballs);
                     mc.options.keyJump.setDown(true);
                     float yaw;
                     float pitch;
@@ -326,7 +328,7 @@ public class FireballBlink extends Module {
                         this.fireballTick = this.countFireCharges();
                         mc.options.keyUse.setDown(true);
                         this.isThrowingFireball = true;
-                        ChatUtil.print("Throwing fireball " + this.queuedFireballs + " (charges=" + this.fireballTick + ")");
+                        debugLog("Throwing fireball " + this.queuedFireballs + " (charges=" + this.fireballTick + ")");
                     } else {
                         this.setEnabled(false);
                     }
@@ -342,14 +344,18 @@ public class FireballBlink extends Module {
                 mc.options.keyJump.setDown(false);
                 rotation = null;
                 this.isThrowingFireball = false;
-                ChatUtil.print("Used fireball " + this.queuedFireballs + " (had " + this.fireballTick + ", now " + current + ")");
+                debugLog("Used fireball " + this.queuedFireballs + " (had " + this.fireballTick + ", now " + current + ")");
             } else if (this.getFireChargeSlot() == -1) {
                 mc.options.keyUse.setDown(false);
                 mc.options.keyJump.setDown(false);
                 rotation = null;
                 this.isThrowingFireball = false;
-                ChatUtil.print("Out of fire charges");
+                debugLog("Out of fire charges");
             }
         }
+    }
+
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
     }
 }

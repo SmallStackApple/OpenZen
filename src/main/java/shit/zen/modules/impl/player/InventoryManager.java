@@ -60,6 +60,7 @@ import shit.zen.event.EventTarget;
 
 public class InventoryManager extends Module {
     public static InventoryManager INSTANCE;
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
 
     private final NumberSetting actionDelaySetting = new NumberSetting("Delay", 200, 0, 500, 10);
     private final NumberSetting sprintDelayTicksSetting = new NumberSetting("Open Delay", 2, 0, 10, 1);
@@ -177,7 +178,7 @@ public class InventoryManager extends Module {
         if (!externalContainerOpen
                 && (packet instanceof ServerboundContainerClickPacket
                         || packet instanceof ServerboundContainerClosePacket)) {
-            ChatUtil.print("Cancelled Inventory Packet: " + packet.getClass().getName());
+            debugLog("Cancelled Inventory Packet: " + packet.getClass().getName());
             event.setCancelled(true);
             Packet<ServerGamePacketListener> typed = (Packet<ServerGamePacketListener>) packet;
             this.pendingPackets.add(typed);
@@ -210,7 +211,7 @@ public class InventoryManager extends Module {
         }
         while (!this.pendingPackets.isEmpty()) {
             Packet<ServerGamePacketListener> packet = this.pendingPackets.poll();
-            ChatUtil.print("Releasing Packet: " + packet.getClass().getName());
+            debugLog("Releasing Packet: " + packet.getClass().getName());
             PacketUtil.sendQueued(packet);
         }
         PacketUtil.sendQueued(new ServerboundContainerClosePacket(mc.player.inventoryMenu.containerId));
@@ -689,5 +690,9 @@ public class InventoryManager extends Module {
         if (stack.getItem() instanceof FishingRodItem && ItemUtil.countItem(Items.FISHING_ROD) > 1) return false;
         if (stack.getItem() instanceof ItemNameBlockItem) return false;
         return ItemUtil.isUsableItem(stack);
+    }
+
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
     }
 }

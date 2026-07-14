@@ -20,8 +20,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import shit.zen.event.impl.PreMotionEvent;
 import shit.zen.event.impl.TickEvent;
 import shit.zen.modules.impl.player.Helper;
-import shit.zen.modules.impl.player.helper.HelperBase;
-import shit.zen.utils.game.ItemUtil;
+import shit.zen.modules.impl.player.helper.HelperBase;import shit.zen.utils.game.ItemUtil;
 import shit.zen.utils.game.PlayerUtil;
 import shit.zen.utils.misc.ChatUtil;
 import shit.zen.utils.misc.PacketUtil;
@@ -170,7 +169,7 @@ extends HelperBase {
                 Helper.markWaterPlaced(this.waterBlockPos);
                 this.useItem(mc.player, mc.level, InteractionHand.MAIN_HAND);
             } else {
-                ChatUtil.print("Failed to place water!");
+                debugLog("Failed to place water!");
                 this.isAiming = false;
                 this.targetRotation = null;
             }
@@ -185,12 +184,16 @@ extends HelperBase {
                 }
                 Helper.removeWaterPlacement(this.waterBlockPos);
             } else {
-                ChatUtil.print("Failed to recycle water due to moving!");
+                debugLog("Failed to recycle water due to moving!");
             }
             if (this.savedSlot != -1) {
                 mc.player.getInventory().selected = this.savedSlot;
             }
             this.waterBlockPos = null;
         }
+    }
+
+    private void debugLog(String msg) {
+        if (Helper.INSTANCE.debug.getValue()) ChatUtil.print(msg);
     }
 }

@@ -6,6 +6,7 @@ import shit.zen.event.impl.PacketEvent;
 import shit.zen.event.impl.TickEvent;
 import shit.zen.modules.Category;
 import shit.zen.modules.Module;
+import shit.zen.settings.impl.BooleanSetting;
 import shit.zen.settings.impl.NumberSetting;
 import shit.zen.utils.misc.ChatUtil;
 import shit.zen.event.EventTarget;
@@ -13,6 +14,7 @@ import shit.zen.event.EventTarget;
 public class AutoPlay
 extends Module {
     public static AutoPlay instance;
+    private final BooleanSetting debug = new BooleanSetting("Debug", false);
     private final NumberSetting delay = new NumberSetting("Delay", 2.0, 0.0, 10.0, 0.1);
     public long disconnectTime = -1L;
     public boolean pendingDisconnect = false;
@@ -54,13 +56,13 @@ extends Module {
         if (packetEvent.getPacket() instanceof ClientboundSystemChatPacket chatPacket) {
             String message = chatPacket.content().getString().replaceAll("§[0-9a-fk-or]", "").trim();
             if (message.contains("地图评分")) {
-                ChatUtil.print("1");
+                debugLog("1");
                 if (this.disconnectTime == -1L) {
                     this.disconnectTime = System.currentTimeMillis();
                     this.pendingDisconnect = true;
                 }
             } else if (message.contains("游戏将在 1 秒 后开始")) {
-                ChatUtil.print("2");
+                debugLog("2");
                 this.disconnectTime = -1L;
                 this.pendingDisconnect = false;
             }
@@ -89,5 +91,9 @@ extends Module {
 
     public NumberSetting getDelay() {
         return this.delay;
+    }
+
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
     }
 }

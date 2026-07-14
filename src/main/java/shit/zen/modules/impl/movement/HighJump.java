@@ -10,6 +10,7 @@ import shit.zen.event.impl.PacketEvent;
 import shit.zen.event.impl.PreTickEvent;
 import shit.zen.modules.Category;
 import shit.zen.modules.Module;
+import shit.zen.settings.impl.BooleanSetting;
 import shit.zen.utils.misc.ChatUtil;
 import shit.zen.utils.misc.PacketUtil;
 import shit.zen.event.EventTarget;
@@ -17,6 +18,7 @@ import shit.zen.event.EventTarget;
 public class HighJump
 extends Module {
     public static HighJump INSTANCE;
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
     public int boostPhase;
     public int tickCounter;
     public int flagState;
@@ -28,6 +30,10 @@ extends Module {
         INSTANCE = this;
     }
 
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
+    }
+
     @Override
     public void onEnable() {
         this.tickCounter = 0;
@@ -36,7 +42,7 @@ extends Module {
         this.skipPacket = 0;
         this.fallbackTicks = 0;
         if (ZenClient.isReady()) {
-            ChatUtil.print("你必须在Bedwars并且你的延迟必须在20ms以下才能使用这个模块");
+            debugLog("你必须在Bedwars并且你的延迟必须在20ms以下才能使用这个模块");
         }
     }
 

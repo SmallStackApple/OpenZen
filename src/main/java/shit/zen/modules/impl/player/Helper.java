@@ -35,6 +35,7 @@ import shit.zen.event.EventTarget;
 public class Helper extends Module {
     public static Helper INSTANCE;
     public static Rotation targetRotation;
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
 
     private static final Map<BlockPos, Integer> waterPlacements = new HashMap<>();
     private static final Map<BlockPos, Integer> lavaPlacements = new HashMap<>();

@@ -9,11 +9,14 @@ import net.minecraft.world.entity.projectile.Fireball;
 import shit.zen.event.impl.MotionEvent;
 import shit.zen.modules.Category;
 import shit.zen.modules.Module;
+import shit.zen.settings.impl.BooleanSetting;
 import shit.zen.utils.misc.ChatUtil;
 import shit.zen.event.EventTarget;
 
 public class AntiFireball
 extends Module {
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
+
     public AntiFireball() {
         super("AntiFireball", Category.COMBAT);
     }
@@ -32,8 +35,12 @@ extends Module {
             return;
         }
         Fireball fireball = optional.get();
-        ChatUtil.print("§c[AntiFireball] Attacking fireball...");
+        debugLog("§c[AntiFireball] Attacking fireball...");
         mc.gameMode.attack(mc.player, fireball);
         mc.player.swing(InteractionHand.MAIN_HAND);
+    }
+
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
     }
 }

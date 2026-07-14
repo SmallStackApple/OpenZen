@@ -89,6 +89,7 @@ public class KillAura extends Module {
     public final ModeSetting delayMode    = new ModeSetting("Delay Mode", "1.8", "1.9").withDefault("1.8");
     public final ModeSetting priorityMode = new ModeSetting("Priority", "Distance", "FoV", "Health", "None").withDefault("FoV");
     public final ModeSetting targetEsp    = new ModeSetting("Target ESP", "None", "Spiral", "Box", "Tab").withDefault("None");
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
 
     private RotationUtil.BestHitInfo currentBestHit;
     private RotationUtil.BestHitInfo prevBestHit;
@@ -324,7 +325,7 @@ public class KillAura extends Module {
         if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
             Entity hitEntity = ((EntityHitResult) hitResult).getEntity();
             if (AntiBots.isBot(hitEntity)) {
-                ChatUtil.print("Skipped attack on suspected bot");
+                debugLog("Skipped attack on suspected bot");
                 return;
             }
         }
@@ -512,5 +513,9 @@ public class KillAura extends Module {
 
     private static boolean isLivingEntity(Entity entity) {
         return entity instanceof LivingEntity;
+    }
+
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
     }
 }

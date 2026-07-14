@@ -39,6 +39,7 @@ extends Module {
     public final NumberSetting attackAmount = new NumberSetting("Attack amount", 5.0, 1.0, 20.0, 1, () -> mode.is("NoXZ"));
     public final BooleanSetting instantAttack = new BooleanSetting("Instant Attack", false, () -> mode.is("NoXZ"));
     public final BooleanSetting sprintStateCheck = new BooleanSetting("Sprint state check", true, () -> mode.is("NoXZ"));
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
 
     public AntiKB() {
         super("AntiKB", Category.COMBAT);

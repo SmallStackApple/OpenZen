@@ -129,7 +129,7 @@ extends AntiKBMode {
                     receivePacketEvent.setCancelled(true);
                 }
                 if (receivePacketEvent.getPacket() instanceof ClientboundPlayerPositionPacket) {
-                    ChatUtil.print("?");
+                    debugLog("?");
                     this.resetState();
                 }
             }
@@ -138,7 +138,7 @@ extends AntiKBMode {
             this.knockbackPacket = null;
             this.flushPackets();
             this.isSuspending = false;
-            ChatUtil.print("Ignore: Player in web or liquid!");
+            debugLog("Ignore: Player in web or liquid!");
         }
     }
 
@@ -265,5 +265,9 @@ extends AntiKBMode {
                 exception.printStackTrace();
             }
         }
+    }
+
+    private void debugLog(String msg) {
+        if (AntiKB.INSTANCE.debug.getValue()) ChatUtil.print(msg);
     }
 }

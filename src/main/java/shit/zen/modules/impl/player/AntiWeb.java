@@ -24,10 +24,12 @@ import shit.zen.utils.misc.ChatUtil;
 import shit.zen.utils.misc.PacketUtil;
 import shit.zen.utils.render.RenderUtil;
 import shit.zen.utils.rotation.Rotation;
+import shit.zen.settings.impl.BooleanSetting;
 import shit.zen.event.EventTarget;
 
 public class AntiWeb extends Module {
     public static AntiWeb INSTANCE;
+    public final BooleanSetting debug = new BooleanSetting("Debug", false);
     public static Rotation targetRotation;
 
     public enum Phase { IDLE, PLACING, RECYCLING }
@@ -131,7 +133,7 @@ public class AntiWeb extends Module {
                 this.placementTimer.reset();
                 this.pickupTimer.reset();
             } else {
-                ChatUtil.print("Could not find water source!");
+                debugLog("Could not find water source!");
                 this.reset();
             }
         }
@@ -164,7 +166,7 @@ public class AntiWeb extends Module {
             }
             case RECYCLING -> {
                 if (this.pickupTimer.hasPassed(20)) {
-                    ChatUtil.print("§cPickup water timeout after 20 ticks, giving up!");
+                    debugLog("§cPickup water timeout after 20 ticks, giving up!");
                     this.reset();
                     return;
                 }
@@ -173,7 +175,7 @@ public class AntiWeb extends Module {
                     return;
                 }
                 if (this.waterSourcePos == null || !mc.level.getBlockState(this.waterSourcePos).is(Blocks.WATER)) {
-                    ChatUtil.print("Failed to recycle water!");
+                    debugLog("Failed to recycle water!");
                     this.reset();
                     return;
                 }
@@ -189,7 +191,7 @@ public class AntiWeb extends Module {
                     this.placementTimer.reset();
                 }
                 if (this.sentUsePacket && !this.placementTimer.hasPassed(5)) break;
-                ChatUtil.print("Trying to recycle water...");
+                debugLog("Trying to recycle water...");
                 PacketUtil.sendPredictive(n -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, n));
                 this.sentUsePacket = true;
                 this.placementTimer.reset();
@@ -248,5 +250,9 @@ public class AntiWeb extends Module {
         this.webCheckTimer.reset();
         this.placementTimer.reset();
         this.pickupTimer.reset();
+    }
+
+    private void debugLog(String msg) {
+        if (debug.getValue()) ChatUtil.print(msg);
     }
 }
