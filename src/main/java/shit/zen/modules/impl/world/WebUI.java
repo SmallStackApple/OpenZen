@@ -3,7 +3,8 @@ package shit.zen.modules.impl.world;
 import com.sun.net.httpserver.HttpServer;
 import java.awt.Desktop;
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import shit.zen.modules.Category;
@@ -14,12 +15,15 @@ import shit.zen.network.webui.SetSettingHandler;
 import shit.zen.network.webui.SettingsHandler;
 import shit.zen.network.webui.StaticFileHandler;
 import shit.zen.network.webui.ToggleModuleHandler;
-import shit.zen.settings.impl.BooleanSetting;
+import shit.zen.settings.impl.ModeSetting;
 import shit.zen.settings.impl.NumberSetting;
 import shit.zen.utils.misc.ChatUtil;
 
 public class WebUI extends Module {
     private HttpServer httpServer;
+
+    public final ModeSetting portMode = new ModeSetting("Port Mode", "Custom", "Random").withDefault("Custom");
+    public final NumberSetting customPort = new NumberSetting("Custom Port", 8089, 1024, 65535, 1, () -> portMode.is("Custom"));
 
     public WebUI() {
         super("WebUI", Category.WORLD);
@@ -29,12 +33,14 @@ public class WebUI extends Module {
     @Override
     public void onEnable() {
         try {
-            this.httpServer = this.createHttpServer();
-            ChatUtil.print("WebUI started at http://127.0.0.1:8089");
+            ServerSocket socket = this.resolveSocket();
+            int port = socket.getLocalPort();
+            this.httpServer = this.createHttpServer(socket);
+            ChatUtil.print("WebUI started at http://127.0.0.1:" + port);
             try {
                 System.setProperty("java.awt.headless", "false");
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    Desktop.getDesktop().browse(new URI("http://127.0.0.1:8089"));
+                    Desktop.getDesktop().browse(new URI("http://127.0.0.1:" + port));
                 }
             } catch (URISyntaxException | IOException ex) {
                 ChatUtil.print("Failed to open browser: " + ex.getMessage());
@@ -55,8 +61,15 @@ public class WebUI extends Module {
         }
     }
 
-    private HttpServer createHttpServer() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8089), 0);
+    private ServerSocket resolveSocket() throws IOException {
+        if (portMode.is("Random")) {
+            return new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+        }
+        return new ServerSocket(customPort.getValue().intValue(), 1, InetAddress.getByName("127.0.0.1"));
+    }
+
+    private HttpServer createHttpServer(ServerSocket socket) throws IOException {
+        HttpServer server = HttpServer.create(socket, 0);
         server.createContext("/api/modulesList", new ModulesHandler());
         server.createContext("/api/categoriesList", new CategoriesHandler());
         server.createContext("/api/setStatus", new ToggleModuleHandler());
