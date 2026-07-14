@@ -2,17 +2,17 @@ package shit.zen.event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class EventBus {
     private static final Logger LOGGER = LogManager.getLogger(EventBus.class);
-    private final Map<Class<? extends EventMarker>, List<ListenerEntry>> listeners = new HashMap<>();
+    private final Map<Class<? extends EventMarker>, List<ListenerEntry>> listeners = new ConcurrentHashMap<>();
 
     public record ListenerEntry(Object listener, Method method, byte priority) {
     }
