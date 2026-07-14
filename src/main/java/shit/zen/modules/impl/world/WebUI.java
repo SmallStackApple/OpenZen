@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,9 +34,8 @@ public class WebUI extends Module {
     @Override
     public void onEnable() {
         try {
-            ServerSocket socket = this.resolveSocket();
-            int port = socket.getLocalPort();
-            this.httpServer = this.createHttpServer(socket);
+            int port = this.resolvePort();
+            this.httpServer = this.createHttpServer(port);
             ChatUtil.print("WebUI started at http://127.0.0.1:" + port);
             try {
                 System.setProperty("java.awt.headless", "false");
@@ -61,15 +61,17 @@ public class WebUI extends Module {
         }
     }
 
-    private ServerSocket resolveSocket() throws IOException {
+    private int resolvePort() throws IOException {
         if (portMode.is("Random")) {
-            return new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+            try (ServerSocket socket = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))) {
+                return socket.getLocalPort();
+            }
         }
-        return new ServerSocket(customPort.getValue().intValue(), 1, InetAddress.getByName("127.0.0.1"));
+        return customPort.getValue().intValue();
     }
 
-    private HttpServer createHttpServer(ServerSocket socket) throws IOException {
-        HttpServer server = HttpServer.create(socket, 0);
+    private HttpServer createHttpServer(int port) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
         server.createContext("/api/modulesList", new ModulesHandler());
         server.createContext("/api/categoriesList", new CategoriesHandler());
         server.createContext("/api/setStatus", new ToggleModuleHandler());
