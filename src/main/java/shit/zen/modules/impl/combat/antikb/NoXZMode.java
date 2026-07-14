@@ -279,7 +279,7 @@ extends AntiKBMode {
         if (entity instanceof LivingEntity && ((livingEntity = (LivingEntity)entity).isDeadOrDying() || livingEntity.getHealth() <= 0.0f)) {
             return false;
         }
-        double maxReach = 3.7f;
+        double maxReach = AntiKB.INSTANCE.maxReach.getValue().doubleValue();
         return !(this.getAABBDistance(entity) > maxReach);
     }
 
@@ -405,7 +405,7 @@ extends AntiKBMode {
             this.clearTarget();
             return;
         }
-        double maxReach = 3.7f;
+        double maxReach = AntiKB.INSTANCE.maxReach.getValue().doubleValue();
         if (this.getAABBDistance(this.attackTarget) > maxReach) {
             this.clearTarget();
             return;
