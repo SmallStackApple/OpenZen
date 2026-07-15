@@ -160,18 +160,13 @@ jobs:
           Write-Host "OPENZEN_BUILD_REV = $env:OPENZEN_BUILD_REVISION"
           .\gradlew.bat --no-daemon clean dll upxCompress
 
-      # Rename the two distributable artifacts so their final filenames carry
-      # the build sha. We rename rather than re-publish at build time so the
-      # local `./gradlew dll` workflow keeps producing stable filenames.
+      # Stage the three build artifacts, then zip them into a single download.
       - name: Stage release artifacts
         shell: pwsh
         run: |
           $sha = "${{ steps.rev.outputs.sha }}"
           $exeSrc = "build\dist\OpenZenLoader.exe"
           $jarSrc = "build\libs\hey-1.0.jar"
-          # The class-name obfuscator emits a fresh, random old->new mapping on every
-          # build; rename-mapping.txt is the ONLY way to de-obfuscate a stack trace, so
-          # ship it with the artifacts/release.
           $mapSrc = "build\rename-mapping.txt"
           if (-not (Test-Path $exeSrc)) { throw "missing $exeSrc" }
           if (-not (Test-Path $jarSrc)) { throw "missing $jarSrc" }
@@ -192,33 +187,14 @@ jobs:
           Write-Host ("OpenZen-{0}.jar       : {1:N0} bytes ({2:N2} MB)" -f $sha, $jarSz, ($jarSz/1MB))
           Write-Host ("OpenZen-{0}-mapping.txt : {1:N0} bytes" -f $sha, (Get-Item $mapDst).Length)
 
-      # NOTE: actions/upload-artifact always wraps its content in a zip; that
-      # is a platform limitation we cannot disable. By giving each artifact a
-      # single file whose name already encodes the sha, the download is
-      # OpenZenLoader-<sha>.exe.zip / OpenZen-<sha>.jar.zip, each containing
-      # just the named file (no nested directory). For raw exe/jar downloads
-      # without the zip wrapper, attach to a GitHub Release instead.
-      - name: Upload OpenZenLoader exe
+      - name: Upload OpenZen artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OpenZenLoader-${{ steps.rev.outputs.sha }}.exe
-          path: build/release/OpenZenLoader-${{ steps.rev.outputs.sha }}.exe
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Upload OpenZen jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenZen-${{ steps.rev.outputs.sha }}.jar
-          path: build/release/OpenZen-${{ steps.rev.outputs.sha }}.jar
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Upload de-obfuscation mapping
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenZen-${{ steps.rev.outputs.sha }}-mapping.txt
-          path: build/release/OpenZen-${{ steps.rev.outputs.sha }}-mapping.txt
+          name: OpenZen-${{ steps.rev.outputs.sha }}
+          path: |
+            build/release/OpenZenLoader-${{ steps.rev.outputs.sha }}.exe
+            build/release/OpenZen-${{ steps.rev.outputs.sha }}.jar
+            build/release/OpenZen-${{ steps.rev.outputs.sha }}-mapping.txt
           if-no-files-found: error
           retention-days: 30
 
