@@ -1,9 +1,8 @@
 package shit.zen.modules.impl.combat.antikb;
 
 import java.util.concurrent.LinkedBlockingDeque;
-import net.minecraft.network.PacketListener;
+
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
@@ -22,7 +21,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -40,7 +38,6 @@ import shit.zen.event.impl.StrafeEvent;
 import shit.zen.event.impl.TickEvent;
 import shit.zen.modules.impl.combat.AntiKB;
 import shit.zen.modules.impl.combat.KillAura;
-import shit.zen.modules.impl.combat.antikb.AntiKBMode;
 import shit.zen.modules.impl.player.Stuck;
 import shit.zen.utils.misc.ChatUtil;
 
@@ -187,15 +184,15 @@ extends AntiKBMode {
     }
 
     @Override
-    public void onPreMotion(PreMotionEvent preMotionEvent) {
-    }
-
-    @Override
     public void onGameTick(GameTickEvent gameTickEvent) {
     }
 
     @Override
     public void onSprint(SprintEvent sprintEvent) {
+    }
+
+    @Override
+    public void onTick(TickEvent var1) {
     }
 
     private void resetAll() {
@@ -284,7 +281,7 @@ extends AntiKBMode {
     }
 
     @Override
-    public void onTick(TickEvent tickEvent) {
+    public void onPreMotion(PreMotionEvent tickEvent) {
         if (mc.player == null) {
             return;
         }
@@ -400,7 +397,7 @@ extends AntiKBMode {
         }
     }
 
-    private void doAttackSequence(TickEvent tickEvent) {
+    private void doAttackSequence(PreMotionEvent preMotionEvent) {
         if (this.attackTarget == null || !this.attackTarget.isAlive()) {
             this.clearTarget();
             return;
