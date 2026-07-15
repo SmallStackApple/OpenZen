@@ -18,6 +18,9 @@ license = "All Rights Reserved"
 modId = "hey" #mandatory
 # The version number of the NS5Nc6
 version = "1.0-SNAPSHOT" #mandatory
+# Build information
+commit="${git_commit}"
+tag="${git_tag}"
 # A display name for the NS5Nc6
 displayName = "hey" #mandatory
 # A URL to query for updates for this NS5Nc6. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/

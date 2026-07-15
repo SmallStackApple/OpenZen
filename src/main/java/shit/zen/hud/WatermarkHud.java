@@ -2,11 +2,16 @@ package shit.zen.hud;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.awt.Color;
+import java.io.IOException;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.util.Mth;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.forgespi.language.IModInfo;
 import shit.zen.ClientBase;
+import shit.zen.ZenClient;
 import shit.zen.modules.impl.movement.Scaffold;
 import shit.zen.render.DrawContext;
 import shit.zen.render.FontPresets;
@@ -22,9 +27,34 @@ implements IHudElement {
     private static final int shadowColor = new Color(0, 0, 0, 100).getRGB();
     private static final float logoCharWidth = logoFont.getWidth("Z");
     private static final float separatorCharWidth = subFont.getWidth("|");
-    private static final float betaRawWidth = subFont.getWidth("beta");
-    private static final float b1RawWidth = subFont.getWidth("b1");
-    private static final float sep1Width = Math.max(betaRawWidth, b1RawWidth);
+    private static final float betaRawWidth = subFont.getWidth("OpenSource");
+    private static final float versionRawWidth;
+    private static final String versionRawString;
+    static {
+        String versionRawString1;
+
+        try {
+            IModInfo mod = ModList.get()
+                    .getModContainerById("hey")
+                    .get()
+                    .getModInfo();
+
+            String commit = mod.getConfig()
+                    .getConfigElement("tag")
+                    .get()
+                    .toString();
+
+            versionRawString1 = commit + "-git";
+
+        } catch (Exception e) {
+            versionRawString1 = "unknown-git";
+        }
+
+        versionRawString = versionRawString1;
+        versionRawWidth = subFont.getWidth(versionRawString1);
+    }
+
+    private static final float sep1Width = Math.max(betaRawWidth, versionRawWidth);
     private static final float betaWidth = logoCharWidth + separatorCharWidth * 2.0f + sep1Width + 48.0f;
     private static final float b1Width = logoFont.getMetrics().capHeight();
     private static final float subLineHeight = subFont.getMetrics().capHeight();
@@ -74,9 +104,9 @@ implements IHudElement {
             drawX += logoCharWidth + 12.0f;
             this.drawText(drawContext, paint, "|", (drawX += 12.0f) - 13.0f, centerY, subFont, subLineHeight, subColor, shadow, true);
             float betaX = (drawX += separatorCharWidth + 12.0f) + (sep1Width - betaRawWidth) / 2.0f - 13.0f;
-            float b1X = drawX + (sep1Width - b1RawWidth) / 2.0f - 13.0f;
-            this.drawText(drawContext, paint, "beta", betaX, centerY - 2.0f, subFont, 0.0f, textColor, shadow, false);
-            this.drawText(drawContext, paint, "b1", b1X, centerY + 7.0f, subFont, 0.0f, subColor, shadow, false);
+            float b1X = drawX + (sep1Width - versionRawWidth) / 2.0f - 13.0f;
+            this.drawText(drawContext, paint, "OpenSource", betaX, centerY - 2.0f, subFont, 0.0f, textColor, shadow, false);
+            this.drawText(drawContext, paint, versionRawString, b1X, centerY + 7.0f, subFont, 0.0f, subColor, shadow, false);
             drawX += sep1Width;
             this.drawText(drawContext, paint, "|", (drawX += 12.0f) - 13.0f, centerY, subFont, subLineHeight, subColor, shadow, true);
             float line1X = (drawX += separatorCharWidth + 12.0f) + (this.maxSubWidth - this.line1Width) / 2.0f - 13.0f;

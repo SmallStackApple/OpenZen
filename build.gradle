@@ -191,6 +191,36 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 }
 
+ext.gitCommit = {
+    try {
+        def p = ['git', 'rev-parse', 'HEAD'].execute(null, project.rootDir)
+        def out = new StringBuilder()
+        p.consumeProcessOutput(out, new StringBuilder())
+        p.waitForOrKill(2000)
+
+        if (p.exitValue() == 0) {
+            return out.toString().trim()
+        }
+    } catch (Exception ignored) {}
+
+    return "unknown"
+}
+
+ext.gitTag = {
+    try {
+        def p = ['git', 'describe', '--tags', '--always'].execute(null, project.rootDir)
+        def out = new StringBuilder()
+        p.consumeProcessOutput(out, new StringBuilder())
+        p.waitForOrKill(2000)
+
+        if (p.exitValue() == 0) {
+            return out.toString().trim()
+        }
+    } catch (Exception ignored) {}
+
+    return "unknown"
+}
+
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
@@ -202,6 +232,7 @@ tasks.named('processResources', ProcessResources).configure {
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors: mod_authors, mod_description: mod_description,
+            git_commit: gitCommit(), git_tag: gitTag()
     ]
     inputs.properties replaceProperties
 
@@ -225,7 +256,9 @@ tasks.named('jar', Jar).configure {
                 'Premain-Class'           : 'asm.patchify.loader.PatchAgent',
                 'Agent-Class'             : 'asm.patchify.loader.PatchAgent',
                 'Can-Retransform-Classes' : 'true',
-                'Can-Redefine-Classes'    : 'true'
+                'Can-Redefine-Classes'    : 'true',
+                'Git-Commit'              : gitCommit(),
+                'Git-Tag'                 : gitTag()
         ])
     }
 
